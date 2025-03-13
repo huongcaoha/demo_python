@@ -1,0 +1,34 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr; /* Hàng 1: 4 phần tử, phần tử đầu tiên rộng gấp đôi */
+    grid-template-rows: auto auto; /* Tự động điều chỉnh chiều cao */
+    gap: 10px; /* Khoảng cách giữa các phần tử */
+    padding: 10px;
+}
+
+.item {
+    background-color: #4CAF50;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    border-radius: 5px;
+}
+
+/* Định nghĩa cho hàng thứ hai */
+.item5 {
+    grid-column: 1 / 2; /* Phần tử đầu tiên trong hàng thứ hai */
+}
+
+.item6 {
+    grid-column: 2 / 4; /* Phần tử thứ hai và thứ ba trong hàng thứ hai */
+}
