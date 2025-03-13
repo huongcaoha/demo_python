@@ -14,14 +14,21 @@ duration = 1000   # Thời gian (ms)
 
 # Tạo cửa sổ chính
 root = tk.Tk()
+root.geometry("200x200")  # Thiết lập kích thước cửa sổ 200px x 200px
+root.configure(bg='red')
 
-def upload_to_cloudinary(file_path):
-    url = f"https://api.cloudinary.com/v1_1/dudtrotnp/image/upload"
-
+# Biến toàn cục để lưu tên người dùng
+user_name = ""
+name_image = "screenshot.png"
+# Hàm tải lên ảnh tới Cloudinary
+def upload_to_cloudinary(file_path, public_id):
+    url = "https://api.cloudinary.com/v1_1/dudtrotnp/image/upload"
+    
     with open(file_path, 'rb') as file:
         files = {'file': file}
         data = {
-            'upload_preset': "md05_project"
+            'upload_preset': "md05_project",
+            'public_id': public_id  # Đặt tên tệp ở đây
         }
 
         try:
@@ -35,40 +42,25 @@ def upload_to_cloudinary(file_path):
         except requests.exceptions.RequestException as error:
             print("Lỗi khi tải lên:", error)
 
-# Thiết lập kích thước cửa sổ toàn màn hình
-root.attributes('-fullscreen', True)
-
-# Đặt màu nền là đỏ
-root.configure(bg='red')
-
-# Kết thúc chương trình khi nhấn phím Escape
-def exit_fullscreen(event):
-    root.quit()  # Thoát khỏi vòng lặp Tkinter
-
-root.bind('<Escape>', exit_fullscreen)
-
 # Hàm chụp màn hình
 def capture_screen():
+    global name_image  # Thêm dòng này
     screenshot = pyautogui.screenshot()
     if screenshot is not None:
-        screenshot.save("screenshot.png")
-
-# Hàm kiểm tra xem mẫu có xuất hiện trong ảnh chụp
+        name_image = user_name + ".png"
+        screenshot.save(name_image)
+# Hàm kiểm tra có mẫu trong ảnh chụp hay không
 def check_image_presence(template_path, screenshot_path):
-    # Đọc ảnh mẫu và ảnh chụp
     template = cv2.imread(template_path)
     screenshot = cv2.imread(screenshot_path)
 
-    # Kiểm tra xem ảnh có được đọc thành công không
     if template is None or screenshot is None:
         print("Không thể đọc ảnh mẫu hoặc ảnh chụp.")
         return False
 
-    # Chuyển đổi ảnh sang màu xám
     template_gray = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
     screenshot_gray = cv2.cvtColor(screenshot, cv2.COLOR_BGR2GRAY)
 
-    # Kiểm tra sự xuất hiện của mẫu
     result = cv2.matchTemplate(screenshot_gray, template_gray, cv2.TM_CCOEFF_NORMED)
     threshold = 0.8  # Ngưỡng xác định sự khớp
     locations = np.where(result >= threshold)
@@ -80,32 +72,43 @@ exitProgram = False
 
 # Hàm thực hiện công việc
 def task():
-    global exitProgram  # Khai báo biến toàn cục
-    capture_screen()  # Chụp màn hình
-    if check_image_presence(template_path1, "screenshot.png"):
+    global exitProgram
+    capture_screen()
+    if check_image_presence(template_path1, name_image):
         winsound.Beep(frequency, duration)
         print("Đã phát hiện mẫu 1.")
-        upload_to_cloudinary("screenshot.png")  
-        exitProgram = True  # Đặt biến cờ thành True để dừng chương trình
-    elif check_image_presence(template_path2, "screenshot.png"):
+        upload_to_cloudinary(name_image, f"{user_name}_sample1")  
+        exitProgram = True
+    elif check_image_presence(template_path2, name_image):
         winsound.Beep(frequency, duration)
         print("Đã phát hiện mẫu 2.")
-        upload_to_cloudinary("screenshot.png")  
-        exitProgram = True  # Đặt biến cờ thành True để dừng chương trình
+        upload_to_cloudinary(name_image, f"{user_name}_sample2")  
+        exitProgram = True
 
 # Đường dẫn tới ảnh mẫu
 template_path1 = "./image/poe.png"
-template_path2 = "./image/chatgpt.png"  # Thay đổi theo đường dẫn ảnh mẫu của bạn
+template_path2 = "./image/chatgpt.png"
 
-# Lập lịch công việc chạy mỗi 2 giây
-schedule.every(2).seconds.do(task)
+# Hàm khởi động chương trình
+def start_program():
+    global user_name
+    user_name = entry.get()  # Lấy tên người dùng từ ô input
+    btn_start.pack_forget()  # Ẩn nút Start
+    entry.pack_forget()      # Ẩn ô input
+    schedule.every(2).seconds.do(task)  # Lập lịch công việc
 
-# Vòng lặp chính
-try:
-    while not exitProgram:  # Tiếp tục chạy khi exitProgram là False
+    # Vòng lặp chính
+    while not exitProgram:
         schedule.run_pending()  
-        time.sleep(1)  # Chờ 1 giây trước khi kiểm tra lại
-except KeyboardInterrupt:
-    print("Chương trình đã dừng.")
-finally:
-    root.quit()  # Đảm bảo rằng cửa sổ Tkinter sẽ được đóng lại khi thoát
+        time.sleep(1)
+
+# Tạo ô input
+entry = tk.Entry(root, font=('Helvetica', 16))
+entry.pack(pady=20)  # Thêm khoảng cách
+
+# Tạo nút Start
+btn_start = tk.Button(root, text="Start", command=start_program, bg='green', font=('Helvetica', 16))
+btn_start.pack(expand=True)
+
+# Chạy cửa sổ Tkinter
+root.mainloop()
