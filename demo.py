@@ -24,6 +24,10 @@ template_path1 = os.path.join(image_folder, "poe.png")
 template_path2 = os.path.join(image_folder, "chatgpt.png")
 template_path3 = os.path.join(image_folder, "openai.png")
 template_path4 = os.path.join(image_folder, "copilotAi.png")
+template_path5 = os.path.join(image_folder, "poe1.png")
+template_path6 = os.path.join(image_folder, "chatgpt1.png")
+template_path7 = os.path.join(image_folder, "openai1.png")
+template_path8 = os.path.join(image_folder, "copilotAi1.png")
 user_name = ""
 name_image = ""
 
@@ -107,7 +111,27 @@ def task():
         winsound.Beep(frequency, duration)
         print("Đã phát hiện dùng copilot.com.")
         upload_to_cloudinary(name_image, f"{user_name}_sample2")  
-        exitProgram = True        
+        exitProgram = True 
+    elif check_image_presence(template_path5, name_image):
+        winsound.Beep(frequency, duration)
+        print("Đã phát hiện dùng poe.com.")
+        upload_to_cloudinary(name_image, f"{user_name}_sample1")  
+        exitProgram = True
+    elif check_image_presence(template_path6, name_image):
+        winsound.Beep(frequency, duration)
+        print("Đã phát hiện dùng chatgpt.com.")
+        upload_to_cloudinary(name_image, f"{user_name}_sample2")  
+        exitProgram = True
+    elif check_image_presence(template_path7, name_image):
+        winsound.Beep(frequency, duration)
+        print("Đã phát hiện dùng openAI.com.")
+        upload_to_cloudinary(name_image, f"{user_name}_sample2")  
+        exitProgram = True
+    elif check_image_presence(template_path8, name_image):
+        winsound.Beep(frequency, duration)
+        print("Đã phát hiện dùng copilot.com.")
+        upload_to_cloudinary(name_image, f"{user_name}_sample2")  
+        exitProgram = True           
 
 # # Đường dẫn tới ảnh mẫu
 # base_path = os.path.dirname(os.path.abspath(__file__))
